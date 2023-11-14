@@ -1,26 +1,33 @@
 import { Injectable } from '@nestjs/common';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
+import { Wishlist } from './entities/wishlist.entity';
 
-@Injectable()
 export class WishlistsService {
-  create(createWishlistDto: CreateWishlistDto) {
-    return 'This action adds a new wishlist';
+  constructor(
+    @InjectRepository(Wishlist)
+    private userRepository: Repository<Wishlist>,
+  ) {}
+
+  async create(createWishlistDto: CreateWishlistDto): Promise<Wishlist> {
+    return this.userRepository.save(createWishlistDto);
   }
 
-  findAll() {
-    return `This action returns all wishlists`;
+  async findAll(): Promise<Wishlist[]> {
+    return this.userRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} wishlist`;
+  async findOne(id: number): Promise<Wishlist> {
+    return this.userRepository.findOneBy({ id });
   }
 
   update(id: number, updateWishlistDto: UpdateWishlistDto) {
-    return `This action updates a #${id} wishlist`;
+    return this.userRepository.update({ id }, updateWishlistDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} wishlist`;
+    return this.userRepository.delete({ id });
   }
 }
