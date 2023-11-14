@@ -6,7 +6,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { Min, Max, IsEmail } from 'class-validator';
+import { Min, Max, IsEmail, IsUrl } from 'class-validator';
 import { Wish } from 'src/wishes/entities/wish.entity';
 import { Offer } from 'src/offers/entities/offer.entity';
 import { Wishlist } from 'src/wishlists/entities/wishlist.entity';
@@ -39,6 +39,7 @@ export class User {
   @Column({
     default: 'https://i.pravatar.cc/300',
   })
+  @IsUrl()
   avatar: string;
 
   @Column({
