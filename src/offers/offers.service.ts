@@ -20,7 +20,7 @@ export class OffersService {
     return this.offerRepository.find();
   }
 
-  findOne(id: number): Promise<Offer> {
+  async findOne(id: number): Promise<Offer> {
     return this.offerRepository.findOneBy({ id });
   }
 
