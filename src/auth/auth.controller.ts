@@ -19,7 +19,7 @@ export class AuthController {
   @Post('signin')
   signin(@Req() req) {
     /* Генерируем для пользователя JWT-токен */
-    console.log('req', req.user);
+    console.log('req_auth', req.user);
     return this.authService.auth(req.user);
   }
 

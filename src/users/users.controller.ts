@@ -6,12 +6,21 @@ import {
   Patch,
   Param,
   Delete,
+  Headers,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { JwtGuard } from 'src/guards/jwt.guard';
 
+export interface RequestWithUser extends Request {
+  user: User;
+}
+
+@UseGuards(JwtGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -21,9 +30,18 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @Get()
-  findAll(): Promise<User[]> {
-    return this.usersService.findAll();
+  @Get('me')
+  findUser(@Req() req) {
+    return req.user;
+  }
+
+  @Patch('me')
+  update(
+    @Req() req: RequestWithUser,
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.usersService.update(+req.user.id, updateUserDto);
   }
 
   @Get(':id')
@@ -31,13 +49,28 @@ export class UsersController {
     return this.usersService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  @Post('find')
+  findMany(@Body('query') query: string): Promise<User[]> {
+    return this.usersService.findByUsernameOrEmail(query);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
-  }
+  // @Get()
+  // findAll(): Promise<User[]> {
+  //   return this.usersService.findAll();
+  // }
+
+  // @Get(':id')
+  // findOne(@Param('id') id: string): Promise<User> {
+  //   return this.usersService.findOne(+id);
+  // }
+
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  //   return this.usersService.update(+id, updateUserDto);
+  // }
+
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.usersService.remove(+id);
+  // }
 }

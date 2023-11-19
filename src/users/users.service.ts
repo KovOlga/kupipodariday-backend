@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -28,14 +28,33 @@ export class UsersService {
     return user;
   }
 
+  async findMany(query: any): Promise<User[] | undefined> {
+    const user = await this.usersRepository.find({
+      where: [
+        {
+          username: query,
+        },
+        { email: query },
+      ],
+    });
+
+    return user;
+  }
+
+  findByUsernameOrEmail(query: string): any {
+    return this.findMany(query);
+  }
+
   async findByUsername(username: string) {
     const user = await this.usersRepository.findOneBy({ username });
 
     return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return this.usersRepository.update({ id }, updateUserDto);
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    await this.usersRepository.update(id, updateUserDto);
+
+    return this.findOne(id);
   }
 
   remove(id: number) {
