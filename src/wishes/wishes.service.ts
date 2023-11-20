@@ -9,26 +9,39 @@ import { Wish } from './entities/wish.entity';
 export class WishesService {
   constructor(
     @InjectRepository(Wish)
-    private wishRepository: Repository<Wish>,
+    private wishesRepository: Repository<Wish>,
   ) {}
 
-  async create(createWishDto: CreateWishDto): Promise<Wish> {
-    return this.wishRepository.save(createWishDto);
+  async create(createWishDto: CreateWishDto, ownerId: number): Promise<Wish> {
+    const wish = this.wishesRepository.create({
+      ...createWishDto,
+      owner: { id: ownerId },
+    });
+    return this.wishesRepository.save(wish);
   }
 
   async findAll(): Promise<Wish[]> {
-    return this.wishRepository.find();
+    return this.wishesRepository.find();
   }
 
-  async findOne(id: number): Promise<Wish> {
-    return this.wishRepository.findOneBy({ id });
+  getLast(): Promise<any> {
+    return this.wishesRepository.find({
+      order: {
+        createdAt: 'DESC',
+      },
+      take: 1,
+    });
   }
 
-  update(id: number, updateWishDto: UpdateWishDto) {
-    return this.wishRepository.update({ id }, updateWishDto);
-  }
+  // async findOne(id: number): Promise<Wish> {
+  //   return this.wishesRepository.findOneBy({ id });
+  // }
 
-  remove(id: number) {
-    return this.wishRepository.delete({ id });
-  }
+  // update(id: number, updateWishDto: UpdateWishDto) {
+  //   return this.wishesRepository.update({ id }, updateWishDto);
+  // }
+
+  // remove(id: number) {
+  //   return this.wishesRepository.delete({ id });
+  // }
 }

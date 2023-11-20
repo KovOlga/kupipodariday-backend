@@ -15,10 +15,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { JwtGuard } from 'src/guards/jwt.guard';
-
-export interface RequestWithUser extends Request {
-  user: User;
-}
+import { RequestWithUser } from 'src/utils/types';
 
 @UseGuards(JwtGuard)
 @Controller('users')
@@ -44,6 +41,11 @@ export class UsersController {
     return this.usersService.update(+req.user.id, updateUserDto);
   }
 
+  @Get('me/wishes')
+  findUserWishes(@Req() req: RequestWithUser) {
+    return this.usersService.findUserWishes(+req.user.id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string): Promise<User> {
     return this.usersService.findOne(+id);
@@ -51,13 +53,13 @@ export class UsersController {
 
   @Post('find')
   findMany(@Body('query') query: string): Promise<User[]> {
-    return this.usersService.findByUsernameOrEmail(query);
+    return this.usersService.findMany(query);
   }
 
-  // @Get()
-  // findAll(): Promise<User[]> {
-  //   return this.usersService.findAll();
-  // }
+  @Get()
+  findAll(): Promise<User[]> {
+    return this.usersService.findAll();
+  }
 
   // @Get(':id')
   // findOne(@Param('id') id: string): Promise<User> {

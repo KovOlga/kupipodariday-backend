@@ -12,20 +12,33 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
+  async findAll(): Promise<User[]> {
+    return this.usersRepository.find();
+  }
+
   async create(createUserDto: CreateUserDto): Promise<User> {
     const user = await this.usersRepository.create(createUserDto);
 
     return this.usersRepository.save(user);
   }
 
-  async findAll(): Promise<User[]> {
-    return this.usersRepository.find();
+  async update(userId: number, updateUserDto: UpdateUserDto): Promise<User> {
+    await this.usersRepository.update(userId, updateUserDto);
+
+    return this.usersRepository.findOne({ where: { id: userId } });
   }
 
-  async findOne(id: number): Promise<User> {
-    const user = await this.usersRepository.findOneBy({ id });
+  async findUserWishes(userId: number) {
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+      relations: {
+        wishes: {
+          owner: true,
+        },
+      },
+    });
 
-    return user;
+    return user.wishes;
   }
 
   async findMany(query: any): Promise<User[] | undefined> {
@@ -41,8 +54,10 @@ export class UsersService {
     return user;
   }
 
-  findByUsernameOrEmail(query: string): any {
-    return this.findMany(query);
+  async findOne(id: number): Promise<User> {
+    const user = await this.usersRepository.findOneBy({ id });
+
+    return user;
   }
 
   async findByUsername(username: string) {
@@ -51,13 +66,7 @@ export class UsersService {
     return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-    await this.usersRepository.update(id, updateUserDto);
-
-    return this.findOne(id);
-  }
-
-  remove(id: number) {
-    return this.usersRepository.delete({ id });
-  }
+  // remove(id: number) {
+  //   return this.usersRepository.delete({ id });
+  // }
 }
