@@ -42,15 +42,22 @@ export class UsersController {
   }
 
   @Get('me/wishes')
-  findUserWishes(@Req() req: RequestWithUser) {
+  findMyWishes(@Req() req: RequestWithUser) {
     return this.usersService.findUserWishes(+req.user.id);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string): Promise<User> {
-    return this.usersService.findOne(+id);
+  @Get(':username')
+  findOne(@Param('username') username: string): Promise<User> {
+    return this.usersService.findByUsername(username);
   }
 
+  @Get(':username/wishes')
+  async findUserWishes(@Param('username') username: string) {
+    const user = await this.usersService.findByUsername(username);
+    return this.usersService.findUserWishes(+user.id);
+  }
+
+  //////////////
   @Post('find')
   findMany(@Body('query') query: string): Promise<User[]> {
     return this.usersService.findMany(query);
