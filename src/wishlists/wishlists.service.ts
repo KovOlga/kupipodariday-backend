@@ -15,8 +15,14 @@ export class WishlistsService {
     return this.userRepository.save(createWishlistDto);
   }
 
-  async findAll(): Promise<Wishlist[]> {
-    return this.userRepository.find();
+  async findAll(userId: number): Promise<Wishlist[]> {
+    return this.userRepository.find({
+      where: {
+        owner: {
+          id: userId,
+        },
+      },
+    });
   }
 
   async findOne(id: number): Promise<Wishlist> {

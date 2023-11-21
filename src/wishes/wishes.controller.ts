@@ -36,18 +36,29 @@ export class WishesController {
     return this.wishesService.getLast();
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string): Promise<Wish> {
-  //   return this.wishesService.findOne(+id);
-  // }
+  @Get('top')
+  getTopWishes() {
+    return this.wishesService.getTopWishes();
+  }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateWishDto: UpdateWishDto) {
-  //   return this.wishesService.update(+id, updateWishDto);
-  // }
+  @Get(':id')
+  findOne(@Param('id') id: string): Promise<Wish> {
+    return this.wishesService.findOne(+id);
+  }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.wishesService.remove(+id);
-  // }
+  @Delete(':id')
+  deleteOneWish(@Param('id') id: string) {
+    this.wishesService.remove(+id);
+  }
+
+  @Patch(':id')
+  updateWish(@Param('id') id: string, @Body() updateWishDto: UpdateWishDto) {
+    return this.wishesService.update(+id, updateWishDto);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post(':id/copy')
+  copyWish(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return this.wishesService.copy(req.user.id, +id);
+  }
 }

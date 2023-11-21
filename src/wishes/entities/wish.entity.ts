@@ -22,9 +22,7 @@ export class Wish {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column({
-    unique: true,
-  })
+  @Column()
   @Min(1)
   @Max(250)
   name: string;
@@ -39,7 +37,7 @@ export class Wish {
   @Column()
   price: number;
 
-  @Column()
+  @Column({ default: 0 })
   raised: number;
 
   @Column()

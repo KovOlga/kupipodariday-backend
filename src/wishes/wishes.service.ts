@@ -1,19 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Wish } from './entities/wish.entity';
 
 @Injectable()
 export class WishesService {
   constructor(
+    private dataSource: DataSource,
     @InjectRepository(Wish)
     private wishesRepository: Repository<Wish>,
   ) {}
 
   async create(createWishDto: CreateWishDto, ownerId: number): Promise<Wish> {
-    const wish = this.wishesRepository.create({
+    const wish = await this.wishesRepository.create({
       ...createWishDto,
       owner: { id: ownerId },
     });
@@ -21,7 +22,11 @@ export class WishesService {
   }
 
   async findAll(): Promise<Wish[]> {
-    return this.wishesRepository.find();
+    return this.wishesRepository.find({
+      relations: {
+        owner: true,
+      },
+    });
   }
 
   getLast(): Promise<any> {
@@ -29,19 +34,84 @@ export class WishesService {
       order: {
         createdAt: 'DESC',
       },
-      take: 1,
+      take: 2,
+      relations: {
+        offers: {
+          item: true,
+        },
+      },
     });
   }
 
-  // async findOne(id: number): Promise<Wish> {
-  //   return this.wishesRepository.findOneBy({ id });
-  // }
+  getTopWishes() {
+    return this.wishesRepository.find({
+      order: {
+        createdAt: 'DESC',
+      },
+      take: 6,
+      relations: {
+        offers: {
+          item: true,
+        },
+      },
+    });
+  }
 
-  // update(id: number, updateWishDto: UpdateWishDto) {
-  //   return this.wishesRepository.update({ id }, updateWishDto);
-  // }
+  async findOne(wishId: number): Promise<Wish> {
+    return this.wishesRepository.findOne({
+      where: {
+        id: wishId,
+      },
+      relations: {
+        owner: true,
+        offers: true,
+      },
+    });
+  }
 
-  // remove(id: number) {
-  //   return this.wishesRepository.delete({ id });
-  // }
+  remove(id: number) {
+    return this.wishesRepository.delete({ id });
+  }
+
+  async update(id: number, updateWishDto: UpdateWishDto) {
+    await this.wishesRepository.update({ id }, updateWishDto);
+    return this.wishesRepository.findOneBy({ id });
+  }
+
+  async copy(userId: any, wishId: number) {
+    const wish = await this.wishesRepository.findOne({
+      where: { id: wishId },
+    });
+
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    wish.copied++;
+
+    const { name, link, image, price, description } = wish;
+
+    const myNewWish = {
+      name,
+      link,
+      image,
+      price,
+      description,
+      owner: { id: userId },
+    };
+
+    try {
+      await this.wishesRepository.save(wish);
+      await this.wishesRepository.create(myNewWish);
+      await this.wishesRepository.save(myNewWish);
+
+      await queryRunner.commitTransaction();
+      return myNewWish;
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      return err.detail;
+    } finally {
+      await queryRunner.release();
+    }
+  }
 }

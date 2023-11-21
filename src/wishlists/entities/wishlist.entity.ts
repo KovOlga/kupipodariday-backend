@@ -5,9 +5,13 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { Min, Max, IsUrl } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
+import { Wish } from 'src/wishes/entities/wish.entity';
+import { CopyWishDto } from 'src/wishes/dto/copy-wish.dto';
 
 @Entity()
 export class Wishlist {
@@ -36,6 +40,7 @@ export class Wishlist {
   @ManyToOne(() => User, (user) => user.wishlists)
   owner: User;
 
-  //   @Column()
-  //   items: [];
+  @ManyToMany(() => Wish)
+  @JoinTable()
+  items: CopyWishDto[];
 }
