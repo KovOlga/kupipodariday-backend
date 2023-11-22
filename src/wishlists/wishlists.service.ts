@@ -1,10 +1,8 @@
-import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
 import { Wishlist } from './entities/wishlist.entity';
-import { Wish } from 'src/wishes/entities/wish.entity';
 
 export class WishlistsService {
   constructor(
@@ -13,13 +11,18 @@ export class WishlistsService {
   ) {}
 
   async findAll(): Promise<Wishlist[]> {
-    return this.wishListsRepository.find();
+    return this.wishListsRepository.find({
+      relations: {
+        owner: true,
+        items: true,
+      },
+    });
   }
 
   async create(
     createWishlistDto: CreateWishlistDto,
     userId: number,
-  ): Promise<any> {
+  ): Promise<Wishlist> {
     const { itemsId, ...rest } = createWishlistDto;
     const items = itemsId.map((id) => ({ id }));
     const newWishList = await this.wishListsRepository.create({
@@ -29,8 +32,16 @@ export class WishlistsService {
       },
       items,
     });
-    console.log('newWishList', newWishList);
-    return this.wishListsRepository.save(newWishList);
+    const { id } = await this.wishListsRepository.save(newWishList);
+    return this.wishListsRepository.findOne({
+      where: {
+        id: id,
+      },
+      relations: {
+        owner: true,
+        items: true,
+      },
+    });
   }
 
   async findOne(wishListId: number): Promise<Wishlist> {
@@ -48,7 +59,10 @@ export class WishlistsService {
     return this.wishListsRepository.delete({ id });
   }
 
-  async update(id: number, updateWishlistDto: UpdateWishlistDto) {
+  async update(
+    id: number,
+    updateWishlistDto: UpdateWishlistDto,
+  ): Promise<Wishlist> {
     const { itemsId, ...rest } = updateWishlistDto;
     const items = itemsId.map((id) => ({ id }));
 

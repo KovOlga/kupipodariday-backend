@@ -29,7 +29,7 @@ export class WishesService {
     });
   }
 
-  getLastWishes(): Promise<any> {
+  getLastWishes(): Promise<Wish[]> {
     return this.wishesRepository.find({
       order: {
         createdAt: 'DESC',
@@ -42,7 +42,7 @@ export class WishesService {
     });
   }
 
-  getTopWishes() {
+  getTopWishes(): Promise<Wish[]> {
     return this.wishesRepository.find({
       order: {
         copied: 'DESC',
@@ -71,7 +71,7 @@ export class WishesService {
     return this.wishesRepository.delete({ id });
   }
 
-  async update(id: number, updateWishDto: UpdateWishDto) {
+  async update(id: number, updateWishDto: UpdateWishDto): Promise<Wish> {
     await this.wishesRepository.update({ id }, updateWishDto);
     return this.wishesRepository.findOneBy({ id });
   }
