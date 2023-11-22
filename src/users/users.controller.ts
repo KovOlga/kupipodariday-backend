@@ -5,8 +5,6 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
-  Headers,
   UseGuards,
   Req,
 } from '@nestjs/common';
@@ -33,31 +31,25 @@ export class UsersController {
   }
 
   @Patch('me')
-  update(
-    @Req() req: RequestWithUser,
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
-    return this.usersService.update(+req.user.id, updateUserDto);
+  update(@Req() req: RequestWithUser, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(req.user.id, updateUserDto);
   }
 
   @Get('me/wishes')
   findMyWishes(@Req() req: RequestWithUser) {
-    return this.usersService.findUserWishes(+req.user.id);
+    return this.usersService.findUserWishes(req.user.username);
   }
 
   @Get(':username')
-  findOne(@Param('username') username: string): Promise<User> {
+  findByUsername(@Param('username') username: string): Promise<User> {
     return this.usersService.findByUsername(username);
   }
 
   @Get(':username/wishes')
   async findUserWishes(@Param('username') username: string) {
-    const user = await this.usersService.findByUsername(username);
-    return this.usersService.findUserWishes(+user.id);
+    return this.usersService.findUserWishes(username);
   }
 
-  //////////////
   @Post('find')
   findMany(@Body('query') query: string): Promise<User[]> {
     return this.usersService.findMany(query);
@@ -67,19 +59,4 @@ export class UsersController {
   findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string): Promise<User> {
-  //   return this.usersService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.usersService.update(+id, updateUserDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.usersService.remove(+id);
-  // }
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { FindManyOptions, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -18,26 +18,33 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const user = await this.usersRepository.create(createUserDto);
-
     return this.usersRepository.save(user);
   }
 
   async update(userId: number, updateUserDto: UpdateUserDto): Promise<User> {
     await this.usersRepository.update(userId, updateUserDto);
-
     return this.usersRepository.findOne({ where: { id: userId } });
   }
 
-  async findUserWishes(userId: number) {
+  async findUserWishes(username: string) {
     const user = await this.usersRepository.findOne({
-      where: { id: userId },
+      where: {
+        wishes: {
+          owner: {
+            username: username,
+          },
+        },
+      },
       relations: {
         wishes: {
           owner: true,
+          offers: true,
         },
       },
     });
-
+    if (!user) {
+      return [];
+    }
     return user.wishes;
   }
 
@@ -56,17 +63,11 @@ export class UsersService {
 
   async findOne(id: number): Promise<User> {
     const user = await this.usersRepository.findOneBy({ id });
-
     return user;
   }
 
   async findByUsername(username: string) {
     const user = await this.usersRepository.findOneBy({ username });
-
     return user;
   }
-
-  // remove(id: number) {
-  //   return this.usersRepository.delete({ id });
-  // }
 }
