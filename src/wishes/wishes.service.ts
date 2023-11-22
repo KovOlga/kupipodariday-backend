@@ -29,16 +29,15 @@ export class WishesService {
     });
   }
 
-  getLast(): Promise<any> {
+  getLastWishes(): Promise<any> {
     return this.wishesRepository.find({
       order: {
         createdAt: 'DESC',
       },
-      take: 2,
+      take: 40,
       relations: {
-        offers: {
-          item: true,
-        },
+        offers: true,
+        owner: true,
       },
     });
   }
@@ -46,13 +45,12 @@ export class WishesService {
   getTopWishes() {
     return this.wishesRepository.find({
       order: {
-        createdAt: 'DESC',
+        copied: 'DESC',
       },
-      take: 6,
+      take: 20,
       relations: {
-        offers: {
-          item: true,
-        },
+        offers: true,
+        owner: true,
       },
     });
   }

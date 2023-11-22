@@ -23,7 +23,7 @@ export class WishesController {
   @UseGuards(JwtGuard)
   @Post()
   create(@Body() createWishDto: CreateWishDto, @Req() req: RequestWithUser) {
-    return this.wishesService.create(createWishDto, +req.user.id);
+    return this.wishesService.create(createWishDto, req.user.id);
   }
 
   @Get()
@@ -32,8 +32,8 @@ export class WishesController {
   }
 
   @Get('last')
-  getLastWish() {
-    return this.wishesService.getLast();
+  getLastWishes() {
+    return this.wishesService.getLastWishes();
   }
 
   @Get('top')
