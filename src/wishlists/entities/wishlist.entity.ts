@@ -8,7 +8,7 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
-import { Min, Max, IsUrl } from 'class-validator';
+import { Min, Max, IsUrl, IsOptional } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
 import { Wish } from 'src/wishes/entities/wish.entity';
 
@@ -28,7 +28,10 @@ export class Wishlist {
   @Max(250)
   name: string;
 
-  @Column()
+  @IsOptional()
+  @Column({
+    default: 'Описание пока не добавлено',
+  })
   @Max(1500)
   description: string;
 
