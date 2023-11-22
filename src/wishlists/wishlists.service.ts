@@ -4,36 +4,68 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
 import { Wishlist } from './entities/wishlist.entity';
+import { Wish } from 'src/wishes/entities/wish.entity';
 
 export class WishlistsService {
   constructor(
     @InjectRepository(Wishlist)
-    private userRepository: Repository<Wishlist>,
+    private wishListsRepository: Repository<Wishlist>,
   ) {}
 
-  async create(createWishlistDto: CreateWishlistDto): Promise<Wishlist> {
-    return this.userRepository.save(createWishlistDto);
+  async findAll(): Promise<Wishlist[]> {
+    return this.wishListsRepository.find();
   }
 
-  async findAll(userId: number): Promise<Wishlist[]> {
-    return this.userRepository.find({
-      where: {
-        owner: {
-          id: userId,
-        },
+  async create(
+    createWishlistDto: CreateWishlistDto,
+    userId: number,
+  ): Promise<any> {
+    const { itemsId, ...rest } = createWishlistDto;
+    const items = itemsId.map((id) => ({ id }));
+    const newWishList = await this.wishListsRepository.create({
+      ...rest,
+      owner: {
+        id: userId,
+      },
+      items,
+    });
+    console.log('newWishList', newWishList);
+    return this.wishListsRepository.save(newWishList);
+  }
+
+  async findOne(wishListId: number): Promise<Wishlist> {
+    const wishList = await this.wishListsRepository.findOne({
+      where: { id: wishListId },
+      relations: {
+        items: true,
+        owner: true,
       },
     });
-  }
-
-  async findOne(id: number): Promise<Wishlist> {
-    return this.userRepository.findOneBy({ id });
-  }
-
-  update(id: number, updateWishlistDto: UpdateWishlistDto) {
-    return this.userRepository.update({ id }, updateWishlistDto);
+    return wishList;
   }
 
   remove(id: number) {
-    return this.userRepository.delete({ id });
+    return this.wishListsRepository.delete({ id });
+  }
+
+  async update(id: number, updateWishlistDto: UpdateWishlistDto) {
+    const { itemsId, ...rest } = updateWishlistDto;
+    const items = itemsId.map((id) => ({ id }));
+
+    await this.wishListsRepository.save({
+      id: id,
+      ...rest,
+      items,
+    });
+
+    const updatedWish = this.wishListsRepository.findOne({
+      where: { id: id },
+      relations: {
+        owner: true,
+        items: true,
+      },
+    });
+
+    return updatedWish;
   }
 }

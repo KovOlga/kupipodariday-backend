@@ -11,7 +11,6 @@ import {
 import { Min, Max, IsUrl } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
 import { Wish } from 'src/wishes/entities/wish.entity';
-import { CopyWishDto } from 'src/wishes/dto/copy-wish.dto';
 
 @Entity()
 export class Wishlist {
@@ -40,7 +39,9 @@ export class Wishlist {
   @ManyToOne(() => User, (user) => user.wishlists)
   owner: User;
 
-  @ManyToMany(() => Wish)
+  @ManyToMany(() => Wish, (wish) => wish.wishlists, {
+    cascade: true,
+  })
   @JoinTable()
-  items: CopyWishDto[];
+  items: Wish[];
 }

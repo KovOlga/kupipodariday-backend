@@ -20,20 +20,28 @@ import { RequestWithUser } from 'src/utils/types';
 export class WishlistsController {
   constructor(private readonly wishlistsService: WishlistsService) {}
 
-  @Post()
-  create(@Body() createWishlistDto: CreateWishlistDto) {
-    return this.wishlistsService.create(createWishlistDto);
+  @Get()
+  findAll(): Promise<Wishlist[]> {
+    return this.wishlistsService.findAll();
   }
 
   @UseGuards(JwtGuard)
-  @Get()
-  findAll(@Req() req: RequestWithUser): Promise<Wishlist[]> {
-    return this.wishlistsService.findAll(+req.user.id);
+  @Post()
+  create(
+    @Req() req: RequestWithUser,
+    @Body() createWishlistDto: CreateWishlistDto,
+  ) {
+    return this.wishlistsService.create(createWishlistDto, req.user.id);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string): Promise<Wishlist> {
     return this.wishlistsService.findOne(+id);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.wishlistsService.remove(+id);
   }
 
   @Patch(':id')
@@ -42,10 +50,5 @@ export class WishlistsController {
     @Body() updateWishlistDto: UpdateWishlistDto,
   ) {
     return this.wishlistsService.update(+id, updateWishlistDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.wishlistsService.remove(+id);
   }
 }
