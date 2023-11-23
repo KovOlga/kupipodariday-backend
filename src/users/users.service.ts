@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { UserAlreadyExistsException } from 'src/exceptions/user-exists.exception';
 
 @Injectable()
 export class UsersService {
@@ -17,8 +18,13 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const user = await this.usersRepository.create(createUserDto);
-    return this.usersRepository.save(user);
+    try {
+      const user = this.usersRepository.create(createUserDto);
+      await this.usersRepository.insert(user);
+      return user;
+    } catch (err) {
+      throw new UserAlreadyExistsException();
+    }
   }
 
   async update(userId: number, updateUserDto: UpdateUserDto): Promise<User> {
