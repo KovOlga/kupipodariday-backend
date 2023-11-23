@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
 import { DataSource, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Wish } from './entities/wish.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class WishesService {
@@ -11,6 +12,8 @@ export class WishesService {
     private dataSource: DataSource,
     @InjectRepository(Wish)
     private wishesRepository: Repository<Wish>,
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
   ) {}
 
   async create(createWishDto: CreateWishDto, ownerId: number): Promise<Wish> {
@@ -81,7 +84,26 @@ export class WishesService {
   async copy(userId: any, wishId: number) {
     const wish = await this.wishesRepository.findOne({
       where: { id: wishId },
+      relations: {
+        owner: {
+          wishes: true,
+        },
+      },
     });
+
+    const isWishExists = await this.wishesRepository.findOne({
+      where: {
+        owner: {
+          wishes: {
+            name: wish.name,
+          },
+        },
+      },
+    });
+
+    if (isWishExists) {
+      throw new ForbiddenException('Данное желание у вас уже имеется');
+    }
 
     const queryRunner = this.dataSource.createQueryRunner();
 

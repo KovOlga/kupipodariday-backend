@@ -24,6 +24,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       database: 'nest_project',
       entities: [User, Wish, Wishlist, Offer],
       synchronize: true,
+      schema: 'nest_project',
     }),
     UsersModule,
     WishesModule,
