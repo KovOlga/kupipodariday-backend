@@ -4,7 +4,6 @@ import { UpdateWishDto } from './dto/update-wish.dto';
 import { DataSource, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Wish } from './entities/wish.entity';
-import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class WishesService {
@@ -12,8 +11,6 @@ export class WishesService {
     private dataSource: DataSource,
     @InjectRepository(Wish)
     private wishesRepository: Repository<Wish>,
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
   ) {}
 
   async create(createWishDto: CreateWishDto, ownerId: number): Promise<Wish> {

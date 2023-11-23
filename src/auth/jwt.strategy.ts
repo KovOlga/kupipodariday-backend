@@ -3,8 +3,6 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
-import { JWT_SECRET } from 'src/config/config';
-import { jwtConstants } from './constants';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -16,8 +14,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       /* Указываем, что токен будет передаваться в заголовке Authorization в формате Bearer <token> */
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       /* Получаем секрет для подписи JWT токенов из конфигурации */
-      // secretOrKey: configService.get<string>(`${JWT_SECRET}`),
-      secretOrKey: jwtConstants.secret,
+      secretOrKey: configService.get<string>('secretKey'),
     });
   }
 
