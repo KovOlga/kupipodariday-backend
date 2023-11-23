@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { CreateOfferDto } from './dto/create-offer.dto';
-import { UpdateOfferDto } from './dto/update-offer.dto';
 import { Offer } from './entities/offer.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
@@ -25,11 +24,20 @@ export class OffersService {
       },
     });
 
+    const { price, raised } = wish;
+
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
     wish.raised = wish.raised + amount;
+
+    if (wish.raised > wish.price) {
+      throw new ForbiddenException(
+        `Для покупки подарка необходимо всего лишь ${price - raised}р.`,
+      );
+    } else {
+    }
 
     try {
       await this.wishesRepository.save(wish);
