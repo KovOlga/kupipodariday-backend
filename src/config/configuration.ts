@@ -16,4 +16,5 @@ export default () => ({
   } as PostgresConnectionOptions,
 
   secretKey: process.env.JWT_SECRET || 'super-strong-secret',
+  saltRound: process.env.SALT_ROUND || 10,
 });

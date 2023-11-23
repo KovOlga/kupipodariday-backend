@@ -5,12 +5,14 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { UserAlreadyExistsException } from 'src/exceptions/user-exists.exception';
+import { HashService } from 'src/hash/hash.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private hashService: HashService,
   ) {}
 
   async findAll(): Promise<User[]> {
@@ -19,7 +21,13 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
-      const user = this.usersRepository.create(createUserDto);
+      const { password, ...rest } = createUserDto;
+      const hash = await this.hashService.hash(password);
+
+      const user = this.usersRepository.create({
+        ...createUserDto,
+        password: hash,
+      });
       await this.usersRepository.insert(user);
       return user;
     } catch (err) {
