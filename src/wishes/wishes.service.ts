@@ -62,7 +62,9 @@ export class WishesService {
       },
       relations: {
         owner: true,
-        offers: true,
+        offers: {
+          user: true,
+        },
       },
     });
   }
