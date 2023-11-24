@@ -88,9 +88,12 @@ export class WishesService {
       },
     });
 
+    console.log('wish', wish.name);
+
     const isWishExists = await this.wishesRepository.findOne({
       where: {
         owner: {
+          id: userId,
           wishes: {
             name: wish.name,
           },
