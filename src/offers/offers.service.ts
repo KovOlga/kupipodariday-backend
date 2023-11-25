@@ -22,6 +22,16 @@ export class OffersService {
       where: {
         id: itemId,
       },
+      select: {
+        owner: {
+          id: true,
+          username: true,
+          about: true,
+          avatar: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
       relations: {
         owner: true,
       },
@@ -67,6 +77,16 @@ export class OffersService {
 
   async findAll(): Promise<Offer[]> {
     return this.offerRepository.find({
+      select: {
+        user: {
+          id: true,
+          username: true,
+          about: true,
+          avatar: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
       relations: {
         user: true,
       },
@@ -77,6 +97,18 @@ export class OffersService {
     const offer = await this.offerRepository.findOne({
       where: {
         id: offerId,
+      },
+      select: {
+        item: {
+          owner: {
+            id: true,
+            username: true,
+            about: true,
+            avatar: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
       },
       relations: {
         user: {

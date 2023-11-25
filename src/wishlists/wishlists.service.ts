@@ -13,6 +13,16 @@ export class WishlistsService {
 
   async findAll(): Promise<Wishlist[]> {
     return this.wishListsRepository.find({
+      select: {
+        owner: {
+          id: true,
+          username: true,
+          about: true,
+          avatar: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
       relations: {
         owner: true,
         items: true,
@@ -38,6 +48,16 @@ export class WishlistsService {
       where: {
         id: id,
       },
+      select: {
+        owner: {
+          id: true,
+          username: true,
+          about: true,
+          avatar: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
       relations: {
         owner: true,
         items: true,
@@ -48,6 +68,16 @@ export class WishlistsService {
   async findOne(wishListId: number): Promise<Wishlist> {
     const wishList = await this.wishListsRepository.findOne({
       where: { id: wishListId },
+      select: {
+        owner: {
+          id: true,
+          username: true,
+          about: true,
+          avatar: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
       relations: {
         items: true,
         owner: true,
@@ -68,6 +98,16 @@ export class WishlistsService {
     const wishList = await this.wishListsRepository.findOne({
       where: {
         id: wishlistId,
+      },
+      select: {
+        owner: {
+          id: true,
+          username: true,
+          about: true,
+          avatar: true,
+          createdAt: true,
+          updatedAt: true,
+        },
       },
       relations: {
         owner: true,
@@ -97,6 +137,16 @@ export class WishlistsService {
 
     const updatedWish = this.wishListsRepository.findOne({
       where: { id: wishlistId },
+      select: {
+        owner: {
+          id: true,
+          username: true,
+          about: true,
+          avatar: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
       relations: {
         owner: true,
         items: true,

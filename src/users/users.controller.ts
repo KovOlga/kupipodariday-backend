@@ -26,7 +26,7 @@ export class UsersController {
   }
 
   @Get('me')
-  findUser(@Req() req) {
+  findUser(@Req() req: RequestWithUser) {
     return req.user;
   }
 

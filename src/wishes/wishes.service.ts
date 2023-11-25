@@ -26,6 +26,16 @@ export class WishesService {
       relations: {
         owner: true,
       },
+      select: {
+        owner: {
+          id: true,
+          username: true,
+          about: true,
+          avatar: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
     });
   }
 
@@ -35,6 +45,16 @@ export class WishesService {
         createdAt: 'DESC',
       },
       take: 40,
+      select: {
+        owner: {
+          id: true,
+          username: true,
+          about: true,
+          avatar: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
       relations: {
         offers: true,
         owner: true,
@@ -48,6 +68,16 @@ export class WishesService {
         copied: 'DESC',
       },
       take: 20,
+      select: {
+        owner: {
+          id: true,
+          username: true,
+          about: true,
+          avatar: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
       relations: {
         offers: true,
         owner: true,
@@ -59,6 +89,26 @@ export class WishesService {
     return this.wishesRepository.findOne({
       where: {
         id: wishId,
+      },
+      select: {
+        owner: {
+          id: true,
+          username: true,
+          about: true,
+          avatar: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+        offers: {
+          user: {
+            id: true,
+            username: true,
+            about: true,
+            avatar: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
       },
       relations: {
         owner: true,
@@ -82,6 +132,16 @@ export class WishesService {
       where: {
         id: wishId,
       },
+      select: {
+        owner: {
+          id: true,
+          username: true,
+          about: true,
+          avatar: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
       relations: {
         owner: true,
         offers: true,
@@ -102,6 +162,16 @@ export class WishesService {
     const wish = await this.wishesRepository.findOne({
       where: {
         id: wishId,
+      },
+      select: {
+        owner: {
+          id: true,
+          username: true,
+          about: true,
+          avatar: true,
+          createdAt: true,
+          updatedAt: true,
+        },
       },
       relations: {
         owner: true,

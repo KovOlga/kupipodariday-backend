@@ -56,6 +56,18 @@ export class UsersService {
           },
         },
       },
+      select: {
+        wishes: {
+          owner: {
+            id: true,
+            username: true,
+            about: true,
+            avatar: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+      },
       relations: {
         wishes: {
           owner: true,

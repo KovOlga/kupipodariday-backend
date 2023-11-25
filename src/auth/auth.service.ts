@@ -30,7 +30,7 @@ export class AuthService {
 
     if (user) {
       const isMatched = await this.hashService.verify(pass, user.password);
-      const { password, ...result } = user;
+      const { password, email, ...result } = user;
 
       return isMatched ? result : null;
     }
