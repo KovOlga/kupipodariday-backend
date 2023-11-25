@@ -36,7 +36,6 @@ export class UsersService {
   }
 
   async update(userId: number, updateUserDto: UpdateUserDto): Promise<User> {
-    console.log('updateUserDto', updateUserDto);
     const { password } = updateUserDto;
     const hash = await this.hashService.hash(password);
 

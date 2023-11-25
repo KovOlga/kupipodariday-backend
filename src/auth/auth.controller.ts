@@ -11,21 +11,14 @@ export class AuthController {
     private authService: AuthService,
   ) {}
 
-  /**
-   * Стратегия local автоматически достанет username и password из тела запроса
-   * Если пароль будет верным, данные пользователя окажутся в объекте req.user
-   */
   @UseGuards(LocalGuard)
   @Post('signin')
   signin(@Req() req) {
-    /* Генерируем для пользователя JWT-токен */
-    console.log('req_auth', req.user);
     return this.authService.auth(req.user);
   }
 
   @Post('signup')
   async signup(@Body() createUserDto: CreateUserDto) {
-    /* При регистрации создаём пользователя и генерируем для него токен */
     const user = await this.usersService.create(createUserDto);
 
     return this.authService.auth(user);

@@ -13,11 +13,11 @@ import { Offer } from './entities/offer.entity';
 import { JwtGuard } from 'src/guards/jwt.guard';
 import { RequestWithUser } from 'src/utils/types';
 
+@UseGuards(JwtGuard)
 @Controller('offers')
 export class OffersController {
   constructor(private readonly offersService: OffersService) {}
 
-  @UseGuards(JwtGuard)
   @Post()
   create(@Req() req: RequestWithUser, @Body() createOfferDto: CreateOfferDto) {
     return this.offersService.create(req.user.id, createOfferDto);

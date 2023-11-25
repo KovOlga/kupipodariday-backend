@@ -16,7 +16,6 @@ import { Wish } from './entities/wish.entity';
 import { JwtGuard } from 'src/guards/jwt.guard';
 import { RequestWithUser } from 'src/utils/types';
 
-@UseGuards(JwtGuard)
 @Controller('wishes')
 export class WishesController {
   constructor(private readonly wishesService: WishesService) {}
@@ -42,16 +41,19 @@ export class WishesController {
     return this.wishesService.getTopWishes();
   }
 
+  @UseGuards(JwtGuard)
   @Get(':id')
   findOne(@Param('id') id: string): Promise<Wish> {
     return this.wishesService.findOne(+id);
   }
 
+  @UseGuards(JwtGuard)
   @Delete(':id')
   deleteOneWish(@Req() req: RequestWithUser, @Param('id') id: string) {
     return this.wishesService.remove(req.user.id, +id);
   }
 
+  @UseGuards(JwtGuard)
   @Patch(':id')
   updateWish(
     @Req() req: RequestWithUser,

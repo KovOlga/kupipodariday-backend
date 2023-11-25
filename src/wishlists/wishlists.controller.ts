@@ -16,6 +16,7 @@ import { Wishlist } from './entities/wishlist.entity';
 import { JwtGuard } from 'src/guards/jwt.guard';
 import { RequestWithUser } from 'src/utils/types';
 
+@UseGuards(JwtGuard)
 @Controller('wishlistlists')
 export class WishlistsController {
   constructor(private readonly wishlistsService: WishlistsService) {}
@@ -25,7 +26,6 @@ export class WishlistsController {
     return this.wishlistsService.findAll();
   }
 
-  @UseGuards(JwtGuard)
   @Post()
   create(
     @Req() req: RequestWithUser,
@@ -39,13 +39,11 @@ export class WishlistsController {
     return this.wishlistsService.findOne(+id);
   }
 
-  @UseGuards(JwtGuard)
   @Delete(':id')
   remove(@Req() req: RequestWithUser, @Param('id') id: string) {
     return this.wishlistsService.remove(req.user.id, +id);
   }
 
-  @UseGuards(JwtGuard)
   @Patch(':id')
   update(
     @Req() req: RequestWithUser,

@@ -126,8 +126,6 @@ export class OffersService {
       return new Object();
     }
 
-    console.log('sxs', offer.hidden);
-
     return offer;
   }
 }
