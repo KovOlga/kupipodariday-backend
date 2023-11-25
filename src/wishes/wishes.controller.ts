@@ -16,6 +16,7 @@ import { Wish } from './entities/wish.entity';
 import { JwtGuard } from 'src/guards/jwt.guard';
 import { RequestWithUser } from 'src/utils/types';
 
+@UseGuards(JwtGuard)
 @Controller('wishes')
 export class WishesController {
   constructor(private readonly wishesService: WishesService) {}
@@ -47,13 +48,17 @@ export class WishesController {
   }
 
   @Delete(':id')
-  deleteOneWish(@Param('id') id: string) {
-    this.wishesService.remove(+id);
+  deleteOneWish(@Req() req: RequestWithUser, @Param('id') id: string) {
+    return this.wishesService.remove(req.user.id, +id);
   }
 
   @Patch(':id')
-  updateWish(@Param('id') id: string, @Body() updateWishDto: UpdateWishDto) {
-    return this.wishesService.update(+id, updateWishDto);
+  updateWish(
+    @Req() req: RequestWithUser,
+    @Param('id') id: string,
+    @Body() updateWishDto: UpdateWishDto,
+  ) {
+    return this.wishesService.update(req.user.id, +id, updateWishDto);
   }
 
   @UseGuards(JwtGuard)

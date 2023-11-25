@@ -22,7 +22,14 @@ export class OffersService {
       where: {
         id: itemId,
       },
+      relations: {
+        owner: true,
+      },
     });
+
+    if (wish.owner.id === userId) {
+      throw new ForbiddenException('Нельзя скинуться на свой подарок');
+    }
 
     const { price, raised } = wish;
 
@@ -66,8 +73,8 @@ export class OffersService {
     });
   }
 
-  async findOne(offerId: number): Promise<Offer> {
-    return this.offerRepository.findOne({
+  async findOne(offerId: number): Promise<Offer | object> {
+    const offer = await this.offerRepository.findOne({
       where: {
         id: offerId,
       },
@@ -82,5 +89,13 @@ export class OffersService {
         },
       },
     });
+
+    if (offer.hidden) {
+      return new Object();
+    }
+
+    console.log('sxs', offer.hidden);
+
+    return offer;
   }
 }

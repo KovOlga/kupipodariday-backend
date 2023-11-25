@@ -1,4 +1,5 @@
 import { Repository } from 'typeorm';
+import { ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
@@ -55,25 +56,47 @@ export class WishlistsService {
     return wishList;
   }
 
-  remove(id: number) {
-    return this.wishListsRepository.delete({ id });
+  async remove(userId: number, wishlistId: number) {
+    if (await this.verifyUserActivity(userId, wishlistId)) {
+      throw new ForbiddenException('Нельзя удалить чужую коллекцию');
+    }
+
+    return this.wishListsRepository.delete({ id: wishlistId });
+  }
+
+  async verifyUserActivity(userId: number, wishlistId: number) {
+    const wishList = await this.wishListsRepository.findOne({
+      where: {
+        id: wishlistId,
+      },
+      relations: {
+        owner: true,
+      },
+    });
+
+    return wishList.owner.id !== userId ? true : false;
   }
 
   async update(
-    id: number,
+    userId: number,
+    wishlistId: number,
     updateWishlistDto: UpdateWishlistDto,
   ): Promise<Wishlist> {
+    if (await this.verifyUserActivity(userId, wishlistId)) {
+      throw new ForbiddenException('Нельзя редактировать чужую коллекцию');
+    }
+
     const { itemsId, ...rest } = updateWishlistDto;
     const items = itemsId.map((id) => ({ id }));
 
     await this.wishListsRepository.save({
-      id: id,
+      id: wishlistId,
       ...rest,
       items,
     });
 
     const updatedWish = this.wishListsRepository.findOne({
-      where: { id: id },
+      where: { id: wishlistId },
       relations: {
         owner: true,
         items: true,

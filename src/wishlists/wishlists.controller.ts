@@ -39,16 +39,19 @@ export class WishlistsController {
     return this.wishlistsService.findOne(+id);
   }
 
+  @UseGuards(JwtGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.wishlistsService.remove(+id);
+  remove(@Req() req: RequestWithUser, @Param('id') id: string) {
+    return this.wishlistsService.remove(req.user.id, +id);
   }
 
+  @UseGuards(JwtGuard)
   @Patch(':id')
   update(
+    @Req() req: RequestWithUser,
     @Param('id') id: string,
     @Body() updateWishlistDto: UpdateWishlistDto,
   ) {
-    return this.wishlistsService.update(+id, updateWishlistDto);
+    return this.wishlistsService.update(req.user.id, +id, updateWishlistDto);
   }
 }

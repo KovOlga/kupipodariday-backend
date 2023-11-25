@@ -11,8 +11,8 @@ export default () => ({
     password: process.env.DATABASE_PASSWORD || 'student',
     database: process.env.DATABASE_NAME || 'nest_project',
     entities: [__dirname + '/../**/*.entity.js'],
-    synchronize: true,
     schema: process.env.DATABASE_SCHEMA || 'nest_project',
+    synchronize: true,
   } as PostgresConnectionOptions,
 
   secretKey: process.env.JWT_SECRET || 'super-strong-secret',

@@ -36,7 +36,14 @@ export class UsersService {
   }
 
   async update(userId: number, updateUserDto: UpdateUserDto): Promise<User> {
-    await this.usersRepository.update(userId, updateUserDto);
+    console.log('updateUserDto', updateUserDto);
+    const { password } = updateUserDto;
+    const hash = await this.hashService.hash(password);
+
+    await this.usersRepository.update(userId, {
+      ...updateUserDto,
+      password: hash,
+    });
     return this.usersRepository.findOne({ where: { id: userId } });
   }
 

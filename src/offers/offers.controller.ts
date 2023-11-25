@@ -29,7 +29,7 @@ export class OffersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<Offer> {
+  findOne(@Param('id') id: string): Promise<Offer | object> {
     return this.offersService.findOne(+id);
   }
 }

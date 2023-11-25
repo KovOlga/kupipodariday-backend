@@ -69,13 +69,54 @@ export class WishesService {
     });
   }
 
-  remove(id: number) {
-    return this.wishesRepository.delete({ id });
+  async remove(userId: number, wishId: number) {
+    if (await this.verifyUserActivity(userId, wishId)) {
+      throw new ForbiddenException('Невозможно удалить чужой подарок');
+    }
+
+    return await this.wishesRepository.delete({ id: wishId });
   }
 
-  async update(id: number, updateWishDto: UpdateWishDto): Promise<Wish> {
-    await this.wishesRepository.update({ id }, updateWishDto);
-    return this.wishesRepository.findOneBy({ id });
+  async verifyUserActivity(userId: number, wishId: number) {
+    const wish = await this.wishesRepository.findOne({
+      where: {
+        id: wishId,
+      },
+      relations: {
+        owner: true,
+        offers: true,
+      },
+    });
+
+    return wish.owner.id !== userId ? true : false;
+  }
+
+  async update(
+    userId: number,
+    wishId: number,
+    updateWishDto: UpdateWishDto,
+  ): Promise<Wish> {
+    if (await this.verifyUserActivity(userId, wishId)) {
+      throw new ForbiddenException('Нельзя редактировать чужие подарки');
+    }
+    const wish = await this.wishesRepository.findOne({
+      where: {
+        id: wishId,
+      },
+      relations: {
+        owner: true,
+        offers: true,
+      },
+    });
+
+    await this.wishesRepository.update(
+      { id: wishId },
+      {
+        ...updateWishDto,
+        price: wish.offers.length === 0 ? updateWishDto.price : wish.price,
+      },
+    );
+    return this.wishesRepository.findOneBy({ id: wishId });
   }
 
   async copy(userId: any, wishId: number) {
