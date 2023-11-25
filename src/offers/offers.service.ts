@@ -99,7 +99,20 @@ export class OffersService {
         id: offerId,
       },
       select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
         item: {
+          id: true,
+          createdAt: true,
+          updatedAt: true,
+          name: true,
+          link: true,
+          image: true,
+          price: true,
+          raised: true,
+          copied: true,
+          description: true,
           owner: {
             id: true,
             username: true,

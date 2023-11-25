@@ -32,7 +32,7 @@ export class UsersController {
 
   @Patch('me')
   update(@Req() req: RequestWithUser, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(req.user.id, updateUserDto);
+    return this.usersService.update(req.user, updateUserDto);
   }
 
   @Get('me/wishes')

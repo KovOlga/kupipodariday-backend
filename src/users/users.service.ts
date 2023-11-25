@@ -35,15 +35,15 @@ export class UsersService {
     }
   }
 
-  async update(userId: number, updateUserDto: UpdateUserDto): Promise<User> {
-    const { password } = updateUserDto;
+  async update(user: User, updateUserDto: UpdateUserDto): Promise<User> {
+    const { password } = user;
     const hash = await this.hashService.hash(password);
 
-    await this.usersRepository.update(userId, {
+    await this.usersRepository.update(user.id, {
       ...updateUserDto,
       password: hash,
     });
-    return this.usersRepository.findOne({ where: { id: userId } });
+    return this.usersRepository.findOne({ where: { id: user.id } });
   }
 
   async findUserWishes(username: string) {
@@ -57,6 +57,16 @@ export class UsersService {
       },
       select: {
         wishes: {
+          id: true,
+          createdAt: true,
+          updatedAt: true,
+          name: true,
+          link: true,
+          image: true,
+          price: true,
+          raised: true,
+          copied: true,
+          description: true,
           owner: {
             id: true,
             username: true,
@@ -77,6 +87,7 @@ export class UsersService {
     if (!user) {
       return [];
     }
+
     return user.wishes;
   }
 
