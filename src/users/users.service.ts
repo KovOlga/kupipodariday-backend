@@ -6,6 +6,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { UserAlreadyExistsException } from 'src/exceptions/user-exists.exception';
 import { HashService } from 'src/hash/hash.service';
+import { Wish } from 'src/wishes/entities/wish.entity';
 
 @Injectable()
 export class UsersService {
@@ -36,17 +37,20 @@ export class UsersService {
   }
 
   async update(user: User, updateUserDto: UpdateUserDto): Promise<User> {
-    const { password } = user;
-    const hash = await this.hashService.hash(password);
+    if (updateUserDto.hasOwnProperty('password')) {
+      updateUserDto.password = await this.hashService.hash(
+        updateUserDto.password,
+      );
+    }
 
     await this.usersRepository.update(user.id, {
       ...updateUserDto,
-      password: hash,
     });
+
     return this.usersRepository.findOne({ where: { id: user.id } });
   }
 
-  async findUserWishes(username: string) {
+  async findUserWishes(username: string): Promise<Wish[]> {
     const user = await this.usersRepository.findOne({
       where: {
         wishes: {

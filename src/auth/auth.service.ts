@@ -13,13 +13,11 @@ export class AuthService {
   ) {}
 
   auth(user: User) {
-    const payload = { sub: user.id };
-
     return {
       access_token: this.jwtService.sign(
         { sub: user.id },
         {
-          expiresIn: '7d',
+          expiresIn: '1d',
         },
       ),
     };
@@ -30,7 +28,7 @@ export class AuthService {
 
     if (user) {
       const isMatched = await this.hashService.verify(pass, user.password);
-      const { password, email, ...result } = user;
+      const { password, ...result } = user;
 
       return isMatched ? result : null;
     }
