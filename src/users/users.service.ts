@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -37,17 +37,30 @@ export class UsersService {
   }
 
   async update(user: User, updateUserDto: UpdateUserDto): Promise<User> {
-    if (updateUserDto.hasOwnProperty('password')) {
-      updateUserDto.password = await this.hashService.hash(
-        updateUserDto.password,
-      );
+    if (
+      updateUserDto.hasOwnProperty('email') ||
+      (updateUserDto.hasOwnProperty('username') &&
+        user.email === updateUserDto.email) ||
+      user.username === updateUserDto.username
+    ) {
+      return user;
     }
 
-    await this.usersRepository.update(user.id, {
-      ...updateUserDto,
-    });
+    try {
+      if (updateUserDto.hasOwnProperty('password')) {
+        updateUserDto.password = await this.hashService.hash(
+          updateUserDto.password,
+        );
+      }
 
-    return this.usersRepository.findOne({ where: { id: user.id } });
+      await this.usersRepository.update(user.id, {
+        ...updateUserDto,
+      });
+
+      return this.usersRepository.findOne({ where: { id: user.id } });
+    } catch (err) {
+      throw new UserAlreadyExistsException();
+    }
   }
 
   async findUserWishes(username: string): Promise<Wish[]> {
